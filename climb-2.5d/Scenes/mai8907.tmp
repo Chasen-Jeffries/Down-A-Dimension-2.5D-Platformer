@@ -15,11 +15,11 @@ offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("2_ka2up")
 
-[node name="Background_Walls" type="Node2D" parent="."]
-script = ExtResource("4_gx8ae")
-
 [node name="Player" parent="." instance=ExtResource("1_40poy")]
 position = Vector2(25, 600)
+
+[node name="Background_Walls" type="Node2D" parent="."]
+script = ExtResource("4_gx8ae")
 
 [node name="Level_Manager" type="Node2D" parent="."]
 script = ExtResource("6_hqnt8")

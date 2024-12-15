@@ -15,15 +15,11 @@ func _initialize_grid():
 
 func _draw():
 	# Colors
-	var background_color = Color(0.1, 0.1, 0.2, 1)  # Midnight blue
-	var line_color = Color(0.3, 0.8, 0.7, 1)       # Soft teal/aqua
+	var line_color = Color(1, 1, 1)  # White grid lines
 	var blank_color = Color(0, 0, 0, 0)  # Transparent background
 	
-	# Draw black background first
-	var viewport_size = get_viewport_rect().size
-	draw_rect(Rect2(Vector2.ZERO, viewport_size), background_color, true)
-	
 	# Calculate cell size dynamically
+	var viewport_size = get_viewport_rect().size
 	cell_size.x = viewport_size.x / grid_width
 	cell_size.y = viewport_size.y / grid_height
 	

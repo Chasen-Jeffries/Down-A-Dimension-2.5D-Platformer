@@ -2,10 +2,9 @@ extends CharacterBody2D
 
 @export var speed = 300
 @export var gravity = 30
-@export var jump_force = 550
+@export var jump_force = 300
 
 var start_position = Vector2()  # To store the starting position
-var simulated_z = 0  # Simulated Z position
 
 func _ready():
 	# Save the player's starting position when the game begins
