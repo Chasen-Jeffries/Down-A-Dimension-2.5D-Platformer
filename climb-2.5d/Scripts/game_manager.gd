@@ -1,40 +1,30 @@
 extends Node2D
 
-# Variables
-var player                    # Reference to the player node
-var level_manager             # Reference to the Level Manager
-var current_axis = "x"        # Active axis (x for X-Y plane, z for Y-Z plane)
-var fixed_value = 0           # Fixed value for the current axis
-var game_timer = 0.0          # Track elapsed time
-var game_completed = false    # Prevent multiple victory triggers
-var input_enabled = false     # Flag to enable input after 1 second
-var gameplay_disabled = false # Flag to disable gameplay after victory
+# References
+var player
+var level_manager
+
+# Game state
+var current_axis = "x"  # Active plane: "x" or "z"
+var game_timer = 0.0    # Timer for tracking gameplay duration
+var game_completed = false
+var gameplay_disabled = false
+var input_enabled = false
 
 func _ready():
-	# Find the player and level manager nodes
+	# Find player and level manager
 	player = get_node("/root/World/Player")
 	level_manager = get_node("/root/World/Level_Manager")
-	
-	if not player:
-		push_error("Player node not found!")
-	if not level_manager:
-		push_error("Level_Manager node not found!")
-	else:
-		print("GameManager: Level Manager found.")
-		
-		# Check if level_matrix is loaded
-		if level_manager.level_matrix.size() > 0:
-			level_manager.update_visible_platforms("x", 0)  # Start on X-Y plane
-		else:
-			push_error("LevelManager's level_matrix is empty.")
 
+	if not player or not level_manager:
+		push_error("Player or Level Manager node not found!")
 
 func _process(delta):
 	if gameplay_disabled:
-		if input_enabled and Input.is_action_just_pressed("move_left"):  # A key
-			get_tree().reload_current_scene()  # Restart the current scene
+		if input_enabled and Input.is_action_just_pressed("move_left"):  # Restart scene
+			get_tree().reload_current_scene()
 		return  # Stop updating game logic
-	
+
 	# Update game timer
 	game_timer += delta
 
@@ -42,26 +32,41 @@ func _process(delta):
 	if Input.is_action_just_pressed("turn"):
 		_switch_plane()
 
-	# Check if the player has reached the victory condition
+	# Check victory condition
 	_check_victory()
 
 func _switch_plane():
-	# Toggle the axis
-	if current_axis == "x":
-		current_axis = "z"
-		fixed_value = player.position.x / level_manager.cell_size.x  # Lock current X
-		player.simulated_z = fixed_value  # Update simulated Z
-	else:
-		current_axis = "x"
-		fixed_value = player.simulated_z  # Use the simulated Z value
-		print("Switching back to X-Y plane at simulated Z:", player.simulated_z)
+	if _can_flip():
+		if current_axis == "x":
+			current_axis = "z"
+			level_manager._initialize_plane("z")
+		else:
+			current_axis = "x"
+			level_manager._initialize_plane("x")
 
-	fixed_value = int(fixed_value)  # Round to nearest grid cell
-	print("Switching to axis:", current_axis, "at fixed value:", fixed_value)
+		_align_player_to_plane()
+		
+		# Update respawn point after switching planes
+		player.update_respawn_point(player.position)
+		
+		print("Switched to plane:", current_axis)
 
-	# Update visible platforms
-	level_manager.update_visible_platforms(current_axis, fixed_value)
 
+func _can_flip():
+	# Check if the player is on a '2' tile
+	var tile_x = int(player.position.x / 64)
+	var tile_y = int(player.position.y / 64)
+	var current_plane_matrix = level_manager.plane_x_matrix if current_axis == "x" else level_manager.plane_z_matrix
+
+	if tile_y >= 0 and tile_y < current_plane_matrix.size():
+		if tile_x >= 0 and tile_x < current_plane_matrix[tile_y].size():
+			return current_plane_matrix[tile_y][tile_x] == 2
+	return false
+
+func _align_player_to_plane():
+	# Snap the player to the grid on the new plane
+	player.position.x = round(player.position.x / 64) * 64
+	player.position.y = round(player.position.y / 64) * 64
 
 func _check_victory():
 	# Detect if player moves above the top of the screen

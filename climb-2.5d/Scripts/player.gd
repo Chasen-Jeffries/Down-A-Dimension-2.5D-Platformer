@@ -6,10 +6,12 @@ extends CharacterBody2D
 
 var start_position = Vector2()  # To store the starting position
 var simulated_z = 0  # Simulated Z position
+var respawn_position = Vector2()  # Updated respawn point
 
 func _ready():
-	# Save the player's starting position when the game begins
+	# Save the player's starting position as the initial respawn point
 	start_position = position
+	respawn_position = position
 
 func _physics_process(delta):
 	# Apply gravity if the player is not on the floor
@@ -34,5 +36,10 @@ func _physics_process(delta):
 func _check_fall_off_map():
 	# Check if the player's Y position is below a certain threshold
 	if position.y > 1000:  # Adjust threshold as needed
-		position = start_position  # Reset position to starting point
-		velocity = Vector2()       # Reset velocity
+		position = respawn_position  # Reset to last respawn point
+		velocity = Vector2()         # Reset velocity
+
+func update_respawn_point(new_position):
+	# Update the respawn point dynamically
+	respawn_position = new_position
+	print("Respawn point updated to:", respawn_position)
