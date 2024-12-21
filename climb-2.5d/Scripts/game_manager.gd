@@ -3,6 +3,7 @@ extends Node2D
 # References
 var player
 var level_manager
+var start_menu  # Store the start menu for later use
 
 # Game state
 var game_timer = 0.0    # Timer for tracking gameplay duration
@@ -10,6 +11,10 @@ var input_enabled = false
 var game_completed = false
 var gameplay_disabled = false
 var pre_turn_level = 0  # Store the level before the turn
+var started_game = false
+
+var start_screen = true
+var victory_screen = false
 
 func _ready():
 	# Find player and level manager
@@ -18,8 +23,14 @@ func _ready():
 
 	if not player or not level_manager:
 		push_error("Player or Level Manager node not found!")
-
+		
+	_check_start()
+	
 func _process(delta):
+	if start_screen:
+		_handle_start_input()
+		return  # Skip gameplay logic until start menu is dismissed
+	
 	if gameplay_disabled:
 		_handle_victory_input()
 		return  # Stop gameplay updates when game is completed
@@ -37,6 +48,58 @@ func _process(delta):
 
 	# Check victory condition
 	_check_victory()
+
+func _check_start():
+	if not started_game:
+		_show_start_menu()
+		started_game = true
+		
+func _show_start_menu():
+	var viewport_size = get_viewport_rect().size
+
+	# Create start menu container
+	var start_container = ColorRect.new()
+	start_container.name = "StartMenu"
+	start_container.color = Color(0, 0, 0, 0.7)  # Semi-transparent black
+	start_container.size = viewport_size
+	start_container.position = Vector2(0, 0)
+	add_child(start_container)
+
+	# Centered text container
+	var vbox = VBoxContainer.new()
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	start_container.add_child(vbox)
+	
+	# Title label
+	var title_label = Label.new()
+	title_label.text = "Welcome!"
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_label.set("theme_override_font_sizes/font_size", 36)  # Smaller font size
+	title_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(title_label)
+
+	# Subtitle label
+	var subtitle_label = Label.new()
+	subtitle_label.text = "Press Any Button to Begin"
+	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle_label.set("theme_override_font_sizes/font_size", 18)  # Smaller font size
+	subtitle_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(subtitle_label)
+
+
+func _handle_start_input():
+	if start_screen and Input.is_anything_pressed():
+		_start_game()
+
+func _start_game():
+	# Remove start menu
+	var start_container = get_node_or_null("StartMenu")
+	if start_container:
+		start_container.queue_free()
+	start_screen = false
+
 
 func _is_player_stationary() -> bool:
 	# Replace this with the actual logic to determine if the player is stationary
@@ -126,6 +189,7 @@ func _check_victory():
 
 func _show_victory_screen():
 	var viewport_size = get_viewport_rect().size
+	var victory_screen = true
 
 	# Victory container
 	var victory_container = ColorRect.new()
@@ -190,6 +254,7 @@ func _restart_game():
 	game_completed = false
 	gameplay_disabled = false
 	input_enabled = false
+	victory_screen = false
 	
 	# Clear victory screen
 	var victory_container = get_node_or_null("VictoryContainer")
