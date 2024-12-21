@@ -9,6 +9,7 @@ var game_timer = 0.0    # Timer for tracking gameplay duration
 var input_enabled = false
 var game_completed = false
 var gameplay_disabled = false
+var pre_turn_level = 0  # Store the level before the turn
 
 func _ready():
 	# Find player and level manager
@@ -28,10 +29,45 @@ func _process(delta):
 
 	# Check for level switching
 	if Input.is_action_just_pressed("turn"):
-		_switch_level()
-	
+		var trigger_tile = _get_trigger_tile()  # Check if the player is on a valid trigger tile
+		if _get_trigger_tile() >= 2:
+			pre_turn_level = level_manager.current_level  # Store current level before turning
+			_switch_level()
+			_teleport_on_turn(pre_turn_level)  # Handle teleportation
+
 	# Check victory condition
 	_check_victory()
+
+
+func _teleport_on_turn(level_before_turn):
+	var target_x = 0  # Default value in case no match is found
+
+	# Determine target X based on the level before the turn
+	if level_before_turn == 0 or level_before_turn == 5:
+		target_x = 28  # Teleport to X1
+	elif level_before_turn == 1 or level_before_turn == 6:
+		target_x = 86  # Teleport to X2
+	elif level_before_turn == 2 or level_before_turn == 7:
+		target_x = 144  # Teleport to X3
+	elif level_before_turn == 3 or level_before_turn == 8:
+		target_x = 201  # Teleport to X4
+	elif level_before_turn == 4 or level_before_turn == 9:
+		target_x = 259  # Teleport to X5
+
+	# Debugging: Print the level and target X position
+	print("Level before turn:", level_before_turn, " -> Teleporting to X:", target_x)
+
+	# Perform teleport if target_x is valid
+	if target_x > 0:
+		_change_player_x(target_x)
+
+
+func _change_player_x(new_x: float):
+	if player:
+		# Debugging: Print the player's old and new positions
+		print("Changing player position from X:", player.position.x, " to X:", new_x)
+		player.position.x = new_x
+		
 
 func _switch_level():
 	_align_player_to_grid()
@@ -53,6 +89,7 @@ func _get_trigger_tile():
 	var tile_y = int(center_y / 64)
 	var current_matrix = level_manager.level_matrices[level_manager.current_level]
 
+			
 	var directions = [Vector2(0, 0), Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]
 	for dir in directions:
 		var check_x = tile_x + dir.x
@@ -63,6 +100,10 @@ func _get_trigger_tile():
 				var tile_value = current_matrix[check_y][check_x]
 				if tile_value >= 2:
 					return tile_value
+					
+	# Out of bounds or no valid tile
+	print("Player is out of bounds or no valid tile found.")
+	
 	return 0
 
 func _align_player_to_grid():

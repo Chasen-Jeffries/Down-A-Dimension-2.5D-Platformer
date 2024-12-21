@@ -3,7 +3,6 @@ extends Node2D
 # Array to hold all level matrices
 var level_matrices = []  # List of matrices for each level
 var current_level = 0    # Active level (index)
-
 var cell_size = Vector2(64, 64)  # Grid cell size
 
 func _ready():

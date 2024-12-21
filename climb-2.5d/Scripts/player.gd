@@ -7,6 +7,7 @@ extends CharacterBody2D
 var start_position = Vector2()  # To store the starting position
 var simulated_z = 0  # Simulated Z position
 var respawn_position = Vector2()  # Updated respawn point
+var current_level = 0  # Update this dynamically based on your game's level system
 
 func _ready():
 	# Save the player's starting position as the initial respawn point
