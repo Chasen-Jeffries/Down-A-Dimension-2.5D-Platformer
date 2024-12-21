@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3 uid="uid://dsuwe0e7pcr4p"]
+
+[ext_resource type="Script" path="res://Scripts/start_screen.gd" id="1_ktrh3"]
+
+[node name="StartScreen" type="CanvasLayer"]
+script = ExtResource("1_ktrh3")
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 0.492
+anchor_top = 0.505
+anchor_right = 0.492
+anchor_bottom = 0.505
+offset_left = -49.44
+offset_top = -25.2
+offset_right = 55.56
+offset_bottom = 17.8
+text = "Start"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="."]
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -53.0
+offset_top = -20.0
+offset_right = 54.0
+offset_bottom = 20.0
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

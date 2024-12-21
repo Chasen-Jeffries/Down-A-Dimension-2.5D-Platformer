@@ -30,7 +30,7 @@ func _process(delta):
 	# Check for level switching
 	if Input.is_action_just_pressed("turn"):
 		var trigger_tile = _get_trigger_tile()  # Check if the player is on a valid trigger tile
-		if _get_trigger_tile() >= 2:
+		if _is_player_stationary() and _get_trigger_tile() >= 2:
 			pre_turn_level = level_manager.current_level  # Store current level before turning
 			_switch_level()
 			_teleport_on_turn(pre_turn_level)  # Handle teleportation
@@ -38,6 +38,11 @@ func _process(delta):
 	# Check victory condition
 	_check_victory()
 
+func _is_player_stationary() -> bool:
+	# Replace this with the actual logic to determine if the player is stationary
+	if abs(player.velocity.x) < 0.01 and abs(player.velocity.y) < 0.01:
+		return true  # Player is stationary
+	return false
 
 func _teleport_on_turn(level_before_turn):
 	var target_x = 0  # Default value in case no match is found
@@ -60,6 +65,8 @@ func _teleport_on_turn(level_before_turn):
 	# Perform teleport if target_x is valid
 	if target_x > 0:
 		_change_player_x(target_x)
+		player.update_respawn_point(Vector2(target_x, player.position.y))  # Update respawn point
+
 
 
 func _change_player_x(new_x: float):
