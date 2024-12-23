@@ -55,14 +55,14 @@ func _check_start():
 		started_game = true
 		
 func _show_start_menu():
-	var viewport_size = get_viewport_rect().size
-
+	var viewport_size = get_viewport().get_visible_rect().size  # Updated method to get viewport size
+	
 	# Create start menu container
 	var start_container = ColorRect.new()
 	start_container.name = "StartMenu"
-	start_container.color = Color(0, 0, 0, 0.7)  # Semi-transparent black
-	start_container.size = viewport_size
-	start_container.position = Vector2(0, 0)
+	start_container.color = Color(0, 0, 0, 1)  # Semi-transparent light brown
+	start_container.size = Vector2(viewport_size.x * 0.9, viewport_size.y * 0.6)
+	start_container.position = (viewport_size - start_container.size) / 2
 	add_child(start_container)
 
 	# Centered text container
@@ -74,17 +74,93 @@ func _show_start_menu():
 	
 	# Title label
 	var title_label = Label.new()
-	title_label.text = "Welcome!"
+	title_label.text = "  Welcome!"
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.set("theme_override_font_sizes/font_size", 36)  # Smaller font size
+	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title_label.set("theme_override_font_sizes/font_size", 50)  # Smaller font size
 	title_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
 	vbox.add_child(title_label)
 
+	# Spacer
+	var spacer = Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND  # Ensures it takes up space
+	spacer.custom_minimum_size = Vector2(0, 10)  # Adds 20 pixels of vertical space
+	vbox.add_child(spacer)
+	
+
+	# Subtitle label
+	var Race_label = Label.new()
+	Race_label.text = " Race to the Top!"
+	Race_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	Race_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	Race_label.set("theme_override_font_sizes/font_size", 18)  # Smaller font size
+	Race_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(Race_label)
+	
+	# Subtitle label
+	var Turn_Info_label = Label.new()
+	Turn_Info_label.text = " Turn on orangle platforms"
+	Turn_Info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	Turn_Info_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	Turn_Info_label.set("theme_override_font_sizes/font_size", 18)  # Smaller font size
+	Turn_Info_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(Turn_Info_label)
+
+	# Spacer
+	var mid_spacer = Control.new()
+	mid_spacer.size_flags_vertical = Control.SIZE_EXPAND  # Ensures it takes up space
+	mid_spacer.custom_minimum_size = Vector2(0, 10)  # Adds 20 pixels of vertical space
+	vbox.add_child(mid_spacer)
+	
+	# Subtitle label
+	var Move_label = Label.new()
+	Move_label.text = "          Left: A"
+	Move_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	Move_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	Move_label.set("theme_override_font_sizes/font_size", 18)  # Smaller font size
+	Move_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(Move_label)
+		
+	# Subtitle label
+	var Move_Right_label = Label.new()
+	Move_Right_label.text = "          Right: D"
+	Move_Right_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	Move_Right_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	Move_Right_label.set("theme_override_font_sizes/font_size", 18)  # Smaller font size
+	Move_Right_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(Move_Right_label)
+	
+			# Subtitle label
+	var Jump_label = Label.new()
+	Jump_label.text = "          Jump: W"
+	Jump_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	Jump_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	Jump_label.set("theme_override_font_sizes/font_size", 18)  # Smaller font size
+	Jump_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(Jump_label)
+	
+	
+			# Subtitle label
+	var Turn_label = Label.new()
+	Turn_label.text = "          Turn: Spacebar"
+	Turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	Turn_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	Turn_label.set("theme_override_font_sizes/font_size", 18)  # Smaller font size
+	Turn_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(Turn_label)
+	
+		# Spacer
+	var bot_spacer = Control.new()
+	bot_spacer.size_flags_vertical = Control.SIZE_EXPAND  # Ensures it takes up space
+	bot_spacer.custom_minimum_size = Vector2(0, 20)  # Adds 20 pixels of vertical space
+	vbox.add_child(bot_spacer)
+	
 	# Subtitle label
 	var subtitle_label = Label.new()
-	subtitle_label.text = "Press Any Button to Begin"
+	subtitle_label.text = "  Press Any Button to Begin"
 	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle_label.set("theme_override_font_sizes/font_size", 18)  # Smaller font size
+	subtitle_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	subtitle_label.set("theme_override_font_sizes/font_size", 20)  # Smaller font size
 	subtitle_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
 	vbox.add_child(subtitle_label)
 
@@ -208,15 +284,15 @@ func _show_victory_screen():
 
 	# Victory label
 	var victory_label = Label.new()
-	victory_label.text = "Victory!"
+	victory_label.text = "  Victory!"
 	victory_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	victory_label.set("theme_override_font_sizes/font_size", 48)
+	victory_label.set("theme_override_font_sizes/font_size", 50)
 	victory_label.set("theme_override_colors/font_color", Color(0, 0, 0, 1))
 	vbox.add_child(victory_label)
 
 	# Time label
 	var time_label = Label.new()
-	time_label.text = "Time: %.2f s" % game_timer
+	time_label.text = "    Time: %.2f s" % game_timer
 	time_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	time_label.set("theme_override_font_sizes/font_size", 24)
 	time_label.set("theme_override_colors/font_color", Color(0, 0, 0, 1))
@@ -224,7 +300,7 @@ func _show_victory_screen():
 
 	# "Next Level" Label
 	var next_level = Label.new()
-	next_level.text = "Next level: [D]"
+	next_level.text = "   Next level: [D]"
 	next_level.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	next_level.set("theme_override_font_sizes/font_size", 20)
 	next_level.set("theme_override_colors/font_color", Color(0, 0, 0, 1))
@@ -232,7 +308,7 @@ func _show_victory_screen():
 	
 	# Restart prompt
 	var try_again_label = Label.new()
-	try_again_label.text = "Try Again: [A]"
+	try_again_label.text = "  Try Again: [A]"
 	try_again_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	try_again_label.set("theme_override_font_sizes/font_size", 20)
 	try_again_label.set("theme_override_colors/font_color", Color(0, 0, 0, 1))

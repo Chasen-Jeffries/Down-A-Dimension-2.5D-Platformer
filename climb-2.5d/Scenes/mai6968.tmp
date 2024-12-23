@@ -1,0 +1,28 @@
+[gd_scene load_steps=6 format=3 uid="uid://brh2gplkq80jx"]
+
+[ext_resource type="PackedScene" uid="uid://x3fedc0son0c" path="res://Scenes/player.tscn" id="1_40poy"]
+[ext_resource type="Script" path="res://Scripts/grid_background.gd" id="2_ka2up"]
+[ext_resource type="Script" path="res://Scripts/background_walls.gd" id="4_gx8ae"]
+[ext_resource type="Script" path="res://Scripts/game_manager.gd" id="5_0h3pb"]
+[ext_resource type="Script" path="res://Scripts/level_manager.gd" id="6_hqnt8"]
+
+[node name="World" type="Node2D"]
+
+[node name="GridBackground" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("2_ka2up")
+
+[node name="Background_Walls" type="Node2D" parent="."]
+script = ExtResource("4_gx8ae")
+
+[node name="Player" parent="." instance=ExtResource("1_40poy")]
+position = Vector2(25, 600)
+
+[node name="Level_Manager" type="Node2D" parent="."]
+script = ExtResource("6_hqnt8")
+
+[node name="Game_Manager" type="Node2D" parent="."]
+script = ExtResource("5_0h3pb")
