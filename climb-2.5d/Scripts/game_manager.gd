@@ -323,18 +323,18 @@ func _handle_victory_input():
 		_restart_game()
 	
 	if input_enabled and Input.is_action_just_pressed("move_right"):  # "D" to restart
-		advance_to_next_level()		
+		advance_to_next_level()
 		_restart_game()
 
 func advance_to_next_level():
 	var level_manager = get_node("/root/World/Level_Manager")
 	if level_manager:
-		level_manager.set_current_level(level_manager.current_level + 1)
+		level_manager.set_current_level(level_manager.current_map + 1)
 		
 		# Check if the player has completed all levels
-		if level_manager.current_level >= 11:  # Assuming 11 is the "level count" that signifies game completion
+		if level_manager.current_map >= 11:  # Assuming 11 is the "level count" that signifies game completion
 			show_final_victory_screen()
-			level_manager.current_level = 0  # Reset to the beginning if needed
+			level_manager.current_map = 0  # Reset to the beginning if needed
 	else:
 		push_error("Level_Manager not found in the scene tree.")
 

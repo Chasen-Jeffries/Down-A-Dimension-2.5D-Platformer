@@ -8,17 +8,17 @@ var current_map = 0    # Active level (maps)
 
 # List of map (level) paths
 var level_paths = {
-	0: "res://levels/level_0.json",
-	1: "res://levels/level_1.json",
-	2: "res://levels/level_2.json",
-	3: "res://levels/level_3.json",
-	4: "res://levels/level_4.json",
-	5: "res://levels/level_5.json",
-	6: "res://levels/level_6.json",
-	7: "res://levels/level_7.json",
-	8: "res://levels/level_8.json",
-	9: "res://levels/level_9.json",
-	10: "res://levels/level_10.json"
+	0: "Levels/level_0.json",
+	1: "Levels/level_1.json",
+	2: "Levels/level_2.json",
+	3: "Levels/level_3.json",
+	4: "Levels/level_4.json",
+	5: "Levels/level_5.json",
+	6: "Levels/level_6.json",
+	7: "Levels/level_7.json",
+	8: "Levels/level_8.json",
+	9: "Levels/level_9.json",
+	10: "Levels/level_10.json"
 }
 
 func _ready():
