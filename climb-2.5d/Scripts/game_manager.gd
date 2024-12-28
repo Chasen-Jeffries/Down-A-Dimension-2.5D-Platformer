@@ -321,6 +321,22 @@ func _show_victory_screen():
 func _handle_victory_input():
 	if input_enabled and Input.is_action_just_pressed("move_left"):  # "A" to restart
 		_restart_game()
+	
+	if input_enabled and Input.is_action_just_pressed("move_right"):  # "D" to restart
+		advance_to_next_level()		
+		_restart_game()
+
+func advance_to_next_level():
+	var level_manager = get_node("/root/World/Level_Manager")
+	if level_manager:
+		level_manager.set_current_level(level_manager.current_level + 1)
+		
+		# Check if the player has completed all levels
+		if level_manager.current_level >= 11:  # Assuming 11 is the "level count" that signifies game completion
+			show_final_victory_screen()
+			level_manager.current_level = 0  # Reset to the beginning if needed
+	else:
+		push_error("Level_Manager not found in the scene tree.")
 
 func _restart_game():
 	print("Restarting game...")
@@ -342,3 +358,79 @@ func _restart_game():
 	player.position = player.start_position  # Move player to initial position
 	player.update_respawn_point(player.start_position)
 	print("Game restarted.")
+
+func show_final_victory_screen():
+	var viewport_size = get_viewport_rect().size
+	var victory_screen = true
+
+# Create start menu container
+	var start_container = ColorRect.new()
+	start_container.name = "StartMenu"
+	start_container.color = Color(0, 0, 0, 1)  # Semi-transparent light brown
+	start_container.size = Vector2(viewport_size.x, viewport_size.y)
+	start_container.position = (viewport_size - start_container.size) / 2
+	add_child(start_container)
+
+	# Centered text container
+	var vbox = VBoxContainer.new()
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	start_container.add_child(vbox)
+	
+		# Spacer
+	var top_spacer = Control.new()
+	top_spacer.size_flags_vertical = Control.SIZE_EXPAND  # Ensures it takes up space
+	top_spacer.custom_minimum_size = Vector2(0, 75)  # Adds 20 pixels of vertical space
+	vbox.add_child(top_spacer)
+	
+	# Final Title label
+	var final_title_label = Label.new()
+	final_title_label.text = "Victory!"
+	final_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	final_title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	final_title_label.set("theme_override_font_sizes/font_size", 50)  # Smaller font size
+	final_title_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(final_title_label)
+	
+	# Title label
+	var title_label = Label.new()
+	title_label.text = " Good Game!"
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title_label.set("theme_override_font_sizes/font_size", 50)  # Smaller font size
+	title_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(title_label)
+
+		# Spacer
+	var mid_spacer = Control.new()
+	mid_spacer.size_flags_vertical = Control.SIZE_EXPAND  # Ensures it takes up space
+	mid_spacer.custom_minimum_size = Vector2(0, 15)  # Adds 20 pixels of vertical space
+	vbox.add_child(mid_spacer)
+	
+	# Title label
+	var game_credits_label = Label.new()
+	game_credits_label.text = "made by:"
+	game_credits_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	game_credits_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	game_credits_label.set("theme_override_font_sizes/font_size", 20)  # Smaller font size
+	game_credits_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(game_credits_label)
+
+	# Title label
+	var my_name_label = Label.new()
+	my_name_label.text = "Chasen"
+	my_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	my_name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	my_name_label.set("theme_override_font_sizes/font_size", 50)  # Smaller font size
+	my_name_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(my_name_label)
+	
+		# Title label
+	var name_label = Label.new()
+	name_label.text = "Jeffries"
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	name_label.set("theme_override_font_sizes/font_size", 50)  # Smaller font size
+	name_label.set("theme_override_colors/font_color", Color(1, 1, 1, 1))
+	vbox.add_child(name_label)
