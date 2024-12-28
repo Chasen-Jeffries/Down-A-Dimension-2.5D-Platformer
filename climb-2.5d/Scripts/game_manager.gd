@@ -23,6 +23,8 @@ func _ready():
 
 	if not player or not level_manager:
 		push_error("Player or Level Manager node not found!")
+	else:
+		print("Level Manager Node Found:", level_manager)
 		
 	_check_start()
 	
@@ -42,7 +44,7 @@ func _process(delta):
 	if Input.is_action_just_pressed("turn"):
 		var trigger_tile = _get_trigger_tile()  # Check if the player is on a valid trigger tile
 		if _is_player_stationary() and _get_trigger_tile() >= 2:
-			pre_turn_level = level_manager.current_level  # Store current level before turning
+			pre_turn_level = level_manager.current_level_in_map  # Store current level before turning
 			_switch_level()
 			_teleport_on_turn(pre_turn_level)  # Handle teleportation
 
@@ -218,39 +220,51 @@ func _change_player_x(new_x: float):
 func _switch_level():
 	_align_player_to_grid()
 	var next_level = _get_trigger_tile()
-	
+
 	if next_level >= 2:
-		var target_level = level_manager.current_level - 1 if level_manager.current_level + 2 == next_level else next_level - 2
-		level_manager._initialize_level(target_level)
+		var target_level = level_manager.current_level_in_map - 1 if level_manager.current_level_in_map + 2 == next_level else next_level - 2
+		level_manager._initialize_level(level_manager.current_map, target_level)
 		player.update_respawn_point(player.position)
-		print("Switched to Level:", target_level)
+		print("Switched to Map:", level_manager.current_map, "Level:", target_level)
 	else:
 		print("No valid trigger tile detected.")
 
+
 func _get_trigger_tile():
+	# Ensure level_manager is valid
+	if not level_manager:
+		push_error("Level Manager is null!")
+		return 0
+
 	var center_x = player.position.x + (player.scale.x / 2)
 	var center_y = player.position.y + (player.scale.y / 2)
 
 	var tile_x = int(center_x / 64)
 	var tile_y = int(center_y / 64)
-	var current_matrix = level_manager.level_matrices[level_manager.current_level]
 
-			
-	var directions = [Vector2(0, 0), Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]
-	for dir in directions:
-		var check_x = tile_x + dir.x
-		var check_y = tile_y + dir.y
+	# Safely access current_matrix
+	if level_manager.current_level_in_map < level_manager.maps[level_manager.current_map].size():
+		var current_matrix = level_manager.maps[level_manager.current_map][level_manager.current_level_in_map]
 
-		if check_y >= 0 and check_y < current_matrix.size():
-			if check_x >= 0 and check_x < current_matrix[check_y].size():
-				var tile_value = current_matrix[check_y][check_x]
-				if tile_value >= 2:
-					return tile_value
-					
+		# Check for trigger tiles
+		var directions = [Vector2(0, 0), Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]
+		for dir in directions:
+			var check_x = tile_x + dir.x
+			var check_y = tile_y + dir.y
+
+			if check_y >= 0 and check_y < current_matrix.size():
+				if check_x >= 0 and check_x < current_matrix[check_y].size():
+					var tile_value = current_matrix[check_y][check_x]
+					if tile_value >= 2:
+						return tile_value
+	else:
+		push_error("Invalid current_level_in_map or map data.")
+		print("Current Map:", level_manager.current_map, "Current Level in Map:", level_manager.current_level_in_map)
+
 	# Out of bounds or no valid tile
 	print("Player is out of bounds or no valid tile found.")
-	
 	return 0
+
 
 func _align_player_to_grid():
 	player.position.x = round(player.position.x / 64) * 64
@@ -319,45 +333,78 @@ func _show_victory_screen():
 	input_enabled = true
 
 func _handle_victory_input():
-	if input_enabled and Input.is_action_just_pressed("move_left"):  # "A" to restart
-		_restart_game()
-	
-	if input_enabled and Input.is_action_just_pressed("move_right"):  # "D" to restart
-		advance_to_next_level()
-		_restart_game()
+	if input_enabled:
+		if Input.is_action_just_pressed("move_left"):  # "A" to restart at the beginning
+			print("Restarting the entire game...")
+			_restart_game()  # Resets to Map 0, Level 0
+
+		elif Input.is_action_just_pressed("move_right"):  # "D" to advance to the next map
+			print("Advancing to the next level...")
+			advance_to_next_level()  # Moves to the next map
+
 
 func advance_to_next_level():
+		# Reset game state
+	game_timer = 0.0
+	game_completed = false
+	gameplay_disabled = false
+	input_enabled = false
+	victory_screen = false
+
+	# Clear victory screen
+	var victory_container = get_node_or_null("VictoryContainer")
+	if victory_container:
+		victory_container.queue_free()
+		
 	var level_manager = get_node("/root/World/Level_Manager")
 	if level_manager:
-		level_manager.set_current_level(level_manager.current_map + 1)
-		
-		# Check if the player has completed all levels
-		if level_manager.current_map >= 11:  # Assuming 11 is the "level count" that signifies game completion
+		# Debug: Log current state
+		print("Before advancing:")
+		print("	Current Map Index:", level_manager.current_map)
+		print("	Total Maps:", level_manager.maps.size())
+
+		# Move to the next map
+		if level_manager.current_map + 1 < level_manager.maps.size():
+			level_manager.current_map += 1
+			level_manager.current_level_in_map = 0
+			level_manager._initialize_level(level_manager.current_map, level_manager.current_level_in_map)
+			print("Advanced to Map:", level_manager.current_map, "Level:", level_manager.current_level_in_map)
+		else:
+			# All maps are completed
+			print("No more maps available. Showing victory screen...")
 			show_final_victory_screen()
-			level_manager.current_map = 0  # Reset to the beginning if needed
+			print("All maps completed!")
 	else:
 		push_error("Level_Manager not found in the scene tree.")
 
+	# Reset level and player
+	player.position = player.start_position  # Move player to initial position
+	player.update_respawn_point(player.start_position)
+	print("Game restarted.")
+
 func _restart_game():
 	print("Restarting game...")
-	
+
 	# Reset game state
 	game_timer = 0.0
 	game_completed = false
 	gameplay_disabled = false
 	input_enabled = false
 	victory_screen = false
-	
+
 	# Clear victory screen
 	var victory_container = get_node_or_null("VictoryContainer")
 	if victory_container:
 		victory_container.queue_free()
 
 	# Reset level and player
-	level_manager._initialize_level(0)  # Restart at Level 0
+	level_manager.current_level_in_map = 0
+	level_manager._initialize_level(level_manager.current_map, level_manager.current_level_in_map)	
 	player.position = player.start_position  # Move player to initial position
 	player.update_respawn_point(player.start_position)
 	print("Game restarted.")
+
+
 
 func show_final_victory_screen():
 	var viewport_size = get_viewport_rect().size
